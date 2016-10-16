@@ -21,26 +21,41 @@ import seedu.address.model.task.Task;
  */
 public class TaskManager extends ComponentManager implements InMemoryTaskList {
 	private UniqueItemCollection<Task> tasks;
-	private UniqueItemCollection<Alias> alias;
+	private UniqueItemCollection<Alias> aliases;
+	
+	// Collection to store the tasks / aliases after each command that changes tasks or aliases. ALlows user to undo.
+	private UniqueItemCollection<Task> oldTasks;
+	private UniqueItemCollection<Alias> oldAliases;
+	
+	// Collection to store the current tasks / aliases before an undo command. Allows user to redo.
+	private UniqueItemCollection<Task> undoneTasks;
+	private UniqueItemCollection<Alias> undoneAliases;
+	
 	private final FilteredList<Task> filteredTasks;
 
 
 	public TaskManager() {
 		// TODO: make use of loaded data
 		this.tasks = new UniqueItemCollection<Task>();
-		this.alias = new UniqueItemCollection<Alias>();
+		this.aliases = new UniqueItemCollection<Alias>();
 		filteredTasks = new FilteredList<>(tasks.getInternalList());
 	}
 	
-	public TaskManager(UniqueItemCollection<Task> tasks, UniqueItemCollection<Alias> alias, UserPrefs userPrefs) {
+	public TaskManager(UniqueItemCollection<Task> tasks, UniqueItemCollection<Alias> aliases, UserPrefs userPrefs) {
 		this.tasks = tasks;
-		this.alias = alias;
+		this.aliases = aliases;
 		filteredTasks = new FilteredList<>(this.tasks.getInternalList());
 	}
 	
 	@Override
 	public synchronized void addTask(Task toAdd) throws DuplicateItemException {
+		// Create a temporary storage of tasks and update the global copy only when update is successful
+		UniqueItemCollection<Task> tempTasks = tasks.copyCollection();
+		
 		tasks.add(toAdd);
+		
+		// Update global copies of tasks
+		updateTasks(tempTasks);
 		indicateTaskManagerChanged();
 	}
 	
@@ -48,13 +63,25 @@ public class TaskManager extends ComponentManager implements InMemoryTaskList {
 	public synchronized void updateTask(Task toUpdate, Task newTask) throws ItemNotFoundException {
 		assert tasks.contains(toUpdate);
 		
+		// Create a temporary storage of tasks and update the global copy only when update is successful
+		UniqueItemCollection<Task> tempTasks = tasks.copyCollection();
+		
 		tasks.replace(toUpdate, newTask);
+		
+		// Update global copies of tasks
+		updateTasks(tempTasks);
 		indicateTaskManagerChanged();
 	}
 
 	@Override
 	public synchronized void deleteTask(Task toRemove) throws ItemNotFoundException {
+		// Create a temporary storage of tasks and update the global copy only when update is successful
+		UniqueItemCollection<Task> tempTasks = tasks.copyCollection();
+		
 	    tasks.remove(toRemove);
+	    
+	    // Update global copies of tasks
+	 	updateTasks(tempTasks);
 	    indicateTaskManagerChanged();
 	}
 	
@@ -62,7 +89,13 @@ public class TaskManager extends ComponentManager implements InMemoryTaskList {
 	public void favoriteTask(Task toFavorite) {
 		assert tasks.contains(toFavorite);
 		
+		// Create a temporary storage of tasks and update the global copy only when update is successful
+		UniqueItemCollection<Task> tempTasks = tasks.copyCollection();
+		
 		toFavorite.setAsFavorite();
+		
+		// Update global copies of tasks
+		updateTasks(tempTasks);
 		indicateTaskManagerChanged();
 	}
 
@@ -70,8 +103,81 @@ public class TaskManager extends ComponentManager implements InMemoryTaskList {
 	public void unfavoriteTask(Task toUnfavorite) {
 		assert tasks.contains(toUnfavorite);
 		
+		// Create a temporary storage of tasks and update the global copy only when update is successful
+		UniqueItemCollection<Task> tempTasks = tasks.copyCollection();
+		
 		toUnfavorite.setAsNotFavorite();
+		
+		// Update global copies of tasks
+		updateTasks(tempTasks);
 		indicateTaskManagerChanged();
+	}
+	
+	/**
+	 * Undoes the previous valid command.
+	 */
+	public void undo() throws IllegalStateException {
+		// oldTasks and oldAliases can never be both present since only one will override the other
+		assert oldTasks != null && oldAliases != null;
+		
+		if (oldTasks == null && oldAliases == null) {
+			throw new IllegalStateException("Unable to undo because there is no previous state to revert to");
+		}
+		
+		// Undoing task type command
+		if (oldTasks != null) {
+			// Before undoing, undoneTasks assigned the current values to allow user to redo
+			undoneTasks = tasks;
+			// Since no alias have been undone, undoneAliases set to null
+			undoneAliases = null; 
+			
+			// The current tasks have been reinstated to their older versions
+			tasks = oldTasks;
+			
+		// Undoing alias type command
+		} else if (oldAliases != null) {
+			// Before undoing, undoneAlises assigned the current values to allow user to redo
+			undoneAliases = aliases;
+			// Since no task have been undone, undoneTasks set to null
+			undoneTasks = null; 
+			
+			// The current aliases have been reinstated to their older versions
+			aliases = oldAliases;
+		}
+		
+		// Can only undo once. Hence, oldTasks & oldAliases are set to null after one undo
+		oldAliases = null;
+		oldTasks = null;
+		
+		// Raise the changes
+		indicateTaskManagerChanged();
+		indicateAliasChanged();
+	}
+	
+	/**
+	 * Updates the old & undone copies of tasks & aliases when Tasks have been modified 
+	 */
+	public void updateTasks(UniqueItemCollection<Task> oldCopy) {
+		// Set oldAliases to null to know that it is Tasks that have been modified
+		oldTasks = oldCopy;
+		oldAliases = null;
+		
+		// Since the current command is not redo, clear the undone tasks / aliases
+		undoneTasks = null;
+		undoneAliases = null;	
+	}
+	
+	/**
+	 * Updates the old & undone copies of tasks & aliases when Aliases have been modified
+	 */
+	public void updateAliases(UniqueItemCollection<Alias> oldCopy) {
+		// Set oldTasks to null to know that it is Aliases that have been modified
+		oldAliases = oldCopy;
+		oldTasks = null;
+		
+		// Since the current command is not redo, clear the undone tasks / aliases
+		undoneTasks = null;
+		undoneAliases = null;
 	}
 	
     /** Keeps the internal ObservableList sorted.
@@ -102,25 +208,37 @@ public class TaskManager extends ComponentManager implements InMemoryTaskList {
 	}
 	
 	@Override
-	public void addAlias(Alias toAdd) throws UniqueItemCollection.DuplicateItemException{
-		alias.add(toAdd);
+	public void addAlias(Alias toAdd) throws DuplicateItemException{
+		// Create a temporary storage of tasks and update the global copy only when update is successful
+		UniqueItemCollection<Alias> tempAliases = aliases.copyCollection();
+		
+		aliases.add(toAdd);
+		
+		// Update global copies of tasks
+		updateAliases(tempAliases);
 	    indicateAliasChanged();
 	}
 	
 	@Override
 	public synchronized void deleteAlias(Alias toRemove) throws ItemNotFoundException {
-	    alias.remove(toRemove);
+		// Create a temporary storage of tasks and update the global copy only when update is successful
+		UniqueItemCollection<Alias> tempAliases = aliases.copyCollection();
+		
+	    aliases.remove(toRemove);
+	    
+	    // Update global copies of tasks
+	 	updateAliases(tempAliases);
 	    indicateAliasChanged();
 	}
 	
 	/** Raises an event to indicate the model has changed */
     private void indicateAliasChanged() {
-        raise(new AliasChangedEvent(alias));
+        raise(new AliasChangedEvent(aliases));
     }
     
     @Override
 	public UnmodifiableObservableList<Alias> getAlias() {
-		return new UnmodifiableObservableList<>(alias.getInternalList());
+		return new UnmodifiableObservableList<>(aliases.getInternalList());
 	}
   	
 	interface Expression {

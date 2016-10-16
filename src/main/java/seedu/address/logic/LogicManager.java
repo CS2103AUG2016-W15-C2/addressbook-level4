@@ -2,9 +2,12 @@ package seedu.address.logic;
 
 import java.util.logging.Logger;
 
+import com.google.common.eventbus.Subscribe;
+
 import javafx.collections.ObservableList;
 import seedu.address.commons.core.ComponentManager;
 import seedu.address.commons.core.LogsCenter;
+import seedu.address.commons.events.model.TaskManagerChangedEvent;
 import seedu.address.logic.commands.CommandResult;
 import seedu.address.logic.commands.taskcommands.TaskCommand;
 import seedu.address.logic.parser.TaskCommandsParser;
@@ -12,6 +15,7 @@ import seedu.address.model.Alias;
 import seedu.address.model.task.InMemoryTaskList;
 import seedu.address.model.task.Task;
 import seedu.address.storage.task.TaskStorage;
+import seedu.address.ui.AliasListPanel;
 
 /**
  * The main LogicManager_Task of the app.

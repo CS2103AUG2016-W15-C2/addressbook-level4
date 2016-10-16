@@ -13,6 +13,7 @@ public class CommandParserList {
 				FindCommandParser.class,
 				FavoriteCommandParser.class,
 				UnfavoriteCommandParser.class,
+				UndoCommandParser.class,
 				ListCommandParser.class,
 				AddAliasCommandParser.class, 
 				DeleteAliasCommandParser.class};

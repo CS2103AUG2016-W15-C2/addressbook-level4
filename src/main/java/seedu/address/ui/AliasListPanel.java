@@ -1,6 +1,9 @@
 package seedu.address.ui;
 
+import java.util.Date;
 import java.util.logging.Logger;
+
+import com.google.common.eventbus.Subscribe;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -13,6 +16,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import seedu.address.commons.core.LogsCenter;
+import seedu.address.commons.events.model.TaskManagerChangedEvent;
 import seedu.address.model.Alias;
 
 public class AliasListPanel extends UiPart {
@@ -50,7 +54,7 @@ public class AliasListPanel extends UiPart {
         aliasListPanel.configure(aliasList);
         return aliasListPanel;
     }
-
+    
     private void configure(ObservableList<Alias> aliasList) {
         setConnections(aliasList);
         addToPlaceholder();

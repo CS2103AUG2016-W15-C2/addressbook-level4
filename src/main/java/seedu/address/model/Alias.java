@@ -3,7 +3,7 @@ package seedu.address.model;
 /*
  * A one-word alias for any sentence to be used as a command
  */
-public class Alias {
+public class Alias implements Copiable<Alias> {
 	private String shortcut;
 	private String sentence;
 	
@@ -38,6 +38,11 @@ public class Alias {
                 && this.shortcut.equals(
                 ((Alias) other).getShortcut()));
     }
+
+	@Override
+	public Alias copy() {
+		return new Alias(this.shortcut, this.sentence);
+	}
 
 	
 }

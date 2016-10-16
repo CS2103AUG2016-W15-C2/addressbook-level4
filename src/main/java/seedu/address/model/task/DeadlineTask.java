@@ -19,6 +19,19 @@ public class DeadlineTask extends Task implements FavoritableTask, DatedTask {
 	}
 	
 	@Override
+	public DeadlineTask copy() {
+		String newDescription = this.description.getContent();
+		Date newDeadline = new Date(this.deadline.getTime());
+		DeadlineTask newTask = new DeadlineTask(newDescription, newDeadline);
+		if (this.isFavorite()) {
+			newTask.setAsFavorite();
+		} else {
+			newTask.setAsNotFavorite();
+		}
+		return newTask;
+	}
+	
+	@Override
 	public String toString() {
 		return String.format("[Deadline Task][Description: %s][Deadline: %s]", 
 				description, dateFormat.format(deadline));

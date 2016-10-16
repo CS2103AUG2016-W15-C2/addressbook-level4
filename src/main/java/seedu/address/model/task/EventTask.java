@@ -25,6 +25,19 @@ public class EventTask extends Task implements FavoritableTask, DatedTask {
 		return endDate;
 	}
 	
+	public EventTask copy() {
+		String newDescription = this.description.getContent();
+		Date newStartDate = new Date(this.startDate.getTime());
+		Date newEndDate = new Date(this.endDate.getTime());
+		EventTask newTask = new EventTask(newDescription, newStartDate, newEndDate); 
+		if (this.isFavorite()) {
+			newTask.setAsFavorite();
+		} else {
+			newTask.setAsNotFavorite();
+		}
+		return newTask;
+	}
+	
 	@Override
 	public String toString() {
 		return String.format("[Event Task][Description: %s][Start date: %s][End date: %s]", 
