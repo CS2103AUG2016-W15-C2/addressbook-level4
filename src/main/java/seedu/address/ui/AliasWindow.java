@@ -36,7 +36,7 @@ public class AliasWindow extends UiPart {
         AliasWindow aliasWindow = UiPartLoader.loadUiPart(primaryStage, new AliasWindow());
         aliasWindow.configure(logic);
         return aliasWindow;
-    }
+    } 
 
     @Override
     public void setNode(Node node) {
@@ -59,6 +59,6 @@ public class AliasWindow extends UiPart {
     }
 
     public void show() {
-        dialogStage.showAndWait();
+        dialogStage.show();
     }
 }

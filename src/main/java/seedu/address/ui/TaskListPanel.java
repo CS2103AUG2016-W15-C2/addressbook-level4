@@ -11,11 +11,16 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import seedu.address.commons.events.model.TaskManagerChangedEvent;
 import seedu.address.commons.events.ui.TaskPanelSelectionChangedEvent;
 import seedu.address.model.task.Task;
+import seedu.address.commons.collections.UniqueItemCollection;
 import seedu.address.commons.core.LogsCenter;
 
+import java.util.Date;
 import java.util.logging.Logger;
+
+import com.google.common.eventbus.Subscribe;
 
 /**
  * Panel containing the list of tasks.
@@ -59,6 +64,7 @@ public class TaskListPanel extends UiPart {
     private void configure(ObservableList<Task> taskList) {
         setConnections(taskList);
         addToPlaceholder();
+        registerAsAnEventHandler(this);
     }
 
     private void setConnections(ObservableList<Task> taskList) {
@@ -80,7 +86,15 @@ public class TaskListPanel extends UiPart {
             }
         });
     }
+    
+    @Subscribe
+    public void handleAddressBookChangedEvent(TaskManagerChangedEvent abce) {
+    	UniqueItemCollection<Task> newTasks = abce.data;
+        setConnections(newTasks.getInternalList());
+        logger.info(LogsCenter.getEventHandlingLogMessage(abce, "Refreshed task list"));
+    }
 
+    
     public void scrollTo(int index) {
         Platform.runLater(() -> {
             taskListView.scrollTo(index);

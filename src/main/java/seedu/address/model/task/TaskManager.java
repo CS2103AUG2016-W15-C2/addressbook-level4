@@ -31,7 +31,7 @@ public class TaskManager extends ComponentManager implements InMemoryTaskList {
 	private UniqueItemCollection<Task> undoneTasks;
 	private UniqueItemCollection<Alias> undoneAliases;
 	
-	private final FilteredList<Task> filteredTasks;
+	private FilteredList<Task> filteredTasks;
 
 
 	public TaskManager() {
@@ -148,6 +148,9 @@ public class TaskManager extends ComponentManager implements InMemoryTaskList {
 		// Can only undo once. Hence, oldTasks & oldAliases are set to null after one undo
 		oldAliases = null;
 		oldTasks = null;
+		
+		// Refresh the filtered tasks
+		filteredTasks = new FilteredList<>(this.tasks.getInternalList());
 		
 		// Raise the changes
 		indicateTaskManagerChanged();
