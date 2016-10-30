@@ -87,9 +87,64 @@ public abstract class Task implements FavoritableTask, CompletableTask, Comparab
 			return -1;
 		} else if (!this.isFavorite() && other.isFavorite()) {
 			return 1;
-		} else {
-			// both are favorite/not-favorite - considered equal
-			return 0;
+		} else if (this instanceof FloatingTask && other instanceof DatedTask){
+		    return -1;
+		}
+		else if (this instanceof DeadlineTask && other instanceof DeadlineTask ) {
+		    DeadlineTask thisOne = (DeadlineTask) this;
+		    DeadlineTask otherOne = (DeadlineTask) other;
+		    if(thisOne.getDeadline().before(otherOne.getDeadline())) {
+		        return -1;
+		    }
+		    else if(thisOne.getDeadline().after(otherOne.getDeadline())) {
+		        return 1;
+		    }
+		    else {
+		        return 0;
+		    }
+		}
+		else if (this instanceof EventTask && other instanceof EventTask) {
+		    EventTask thisOne = (EventTask) this;
+		    EventTask otherOne = (EventTask) other;
+		    if(thisOne.getEndDate().before(otherOne.getEndDate())) {
+		        return -1;
+		    }
+		    else if(thisOne.getEndDate().after(otherOne.getEndDate())) {
+		        return 1;
+		    }
+		    else {
+		        return 0;
+		    }
+		}
+	      else if (this instanceof EventTask && other instanceof DeadlineTask) {
+	            EventTask thisOne = (EventTask) this;
+	            DeadlineTask otherOne = (DeadlineTask) other;
+	            if(thisOne.getEndDate().before(otherOne.getDeadline())) {
+	                return -1;
+	            }
+	            else if(thisOne.getEndDate().after(otherOne.getDeadline())) {
+	                return 1;
+	            }
+	            else {
+	                return 0;
+	            }
+	        }
+	      else if (this instanceof DeadlineTask && other instanceof EventTask) {
+	          DeadlineTask thisOne = (DeadlineTask) this;
+	            EventTask otherOne = (EventTask) other;
+	            if(thisOne.getDeadline().before(otherOne.getEndDate())) {
+	                return -1;
+	            }
+	            else if(thisOne.getDeadline().after(otherOne.getEndDate())) {
+	                return 1;
+	            }
+	            else {
+	                return 0;
+	            }
+	        }
+
+		else {
+		    return 0;
 		}
 	}
 	

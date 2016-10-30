@@ -1,5 +1,6 @@
 package seedu.address.model.task;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 import seedu.address.commons.collections.UniqueItemCollection.DuplicateItemException;
@@ -78,6 +79,8 @@ public interface InMemoryTaskList {
 	 * Gets the current list of tasks with the filtering words applied
 	 */
 	UnmodifiableObservableList<Task> getCurrentFilteredTasks();
+	
+	ArrayList<ObservableList<Task>> getListofLists();
 	
 	/*
 	 * Adds a one-word alias for any sentence to be used as a command.

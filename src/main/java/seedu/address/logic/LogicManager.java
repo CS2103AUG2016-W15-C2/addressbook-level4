@@ -1,5 +1,6 @@
 package seedu.address.logic;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import javafx.collections.ObservableList;
@@ -48,8 +49,8 @@ public class LogicManager extends ComponentManager implements Logic {
     }
 
     @Override
-    public ObservableList<Task> getFilteredTaskList() {
-    	return model.getCurrentFilteredTasks();
+    public ArrayList<ObservableList<Task>> getTaskLists() {
+    	return model.getListofLists();
     }
 
     @Override

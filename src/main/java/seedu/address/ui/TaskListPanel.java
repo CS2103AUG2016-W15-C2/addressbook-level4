@@ -19,6 +19,8 @@ import seedu.address.commons.core.LogsCenter;
 import seedu.address.commons.events.model.NewTaskListEvent;
 import seedu.address.commons.events.model.TaskManagerChangedEvent;
 
+import java.awt.Label;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import com.google.common.eventbus.Subscribe;
@@ -33,7 +35,34 @@ public class TaskListPanel extends UiPart {
     private AnchorPane placeHolderPane;
 
     @FXML
-    private ListView<Task> taskListView;
+    private ListView<Task> overdueListView;
+    @FXML
+    private ListView<Task> favoriteListView;
+    @FXML
+    private ListView<Task> todayListView;
+    @FXML
+    private ListView<Task> tomorrowListView;
+    @FXML
+    private ListView<Task> weekAheadListView;
+    @FXML
+    private ListView<Task> othersListView;
+    @FXML
+    private ListView<Task> floatingListView;
+    
+    @FXML
+    Label overdueLabel;
+    
+    private static ObservableList<Task> overdueTaskList;
+    private static ObservableList<Task> favoriteTaskList;
+    private static ObservableList<Task> floatingTaskList;
+    private static ObservableList<Task> todayTaskList;
+    private static ObservableList<Task> tomorrowTaskList;
+    private static ObservableList<Task> weekAheadTaskList;
+    private static ObservableList<Task> othersTaskList;
+    
+    private int index;
+    
+    
 
     public TaskListPanel() {
         super();
@@ -55,38 +84,66 @@ public class TaskListPanel extends UiPart {
     }
 
     public static TaskListPanel load(Stage primaryStage, AnchorPane taskListPlaceholder,
-                                       ObservableList<Task> taskList) {
+                                       ArrayList<ObservableList<Task>> listOfLists) {
         TaskListPanel taskListPanel =
                 UiPartLoader.loadUiPart(primaryStage, taskListPlaceholder, new TaskListPanel());
-        taskListPanel.configure(taskList);
+        taskListPanel.configure(listOfLists);
         return taskListPanel;
     }
 
-    private void configure(ObservableList<Task> taskList) {
-        setConnections(taskList);
+    private static void assignLists(ArrayList<ObservableList<Task>> listOfLists) {
+        overdueTaskList = listOfLists.get(0);
+        favoriteTaskList = listOfLists.get(1);
+        floatingTaskList = listOfLists.get(2);
+        todayTaskList = listOfLists.get(3);
+        tomorrowTaskList = listOfLists.get(4);
+        weekAheadTaskList= listOfLists.get(5);
+        othersTaskList= listOfLists.get(6);
+    }
+
+    private void configure(ArrayList<ObservableList<Task>> listOfLists) {
+        setConnections(listOfLists);
         addToPlaceholder();
         registerAsAnEventHandler(this);
     }
 
-    private void setConnections(ObservableList<Task> taskList) {
-        taskListView.setItems(taskList);
-        taskListView.setCellFactory(listView -> new TaskListViewCell());
+    private void setConnections(ArrayList<ObservableList<Task>> listOfLists) {
+        assignLists(listOfLists);
+        overdueListView.setItems(overdueTaskList);
+        favoriteListView.setItems(favoriteTaskList);
+        floatingListView.setItems(floatingTaskList);
+        todayListView.setItems(todayTaskList);
+        tomorrowListView.setItems(tomorrowTaskList);
+        weekAheadListView.setItems(weekAheadTaskList);
+        othersListView.setItems(othersTaskList);
+        index = 1;
+        overdueListView.setCellFactory(listView -> new TaskListViewCell());
+        index += overdueTaskList.size();
+        favoriteListView.setCellFactory(listView -> new TaskListViewCell());
+        floatingListView.setCellFactory(listView -> new TaskListViewCell());
+        todayListView.setCellFactory(listView -> new TaskListViewCell());
+//        index += todayTaskList.size();
+        tomorrowListView.setCellFactory(listView -> new TaskListViewCell());
+//        index += tomorrowTaskList.size();
+        weekAheadListView.setCellFactory(listView -> new TaskListViewCell());
+//        index += weekAheadTaskList.size();
+        othersListView.setCellFactory(listView -> new TaskListViewCell());
     }
 
     private void addToPlaceholder() {
         placeHolderPane.getChildren().add(panel);
     }
 
-    public void scrollTo(int index) {
-        Platform.runLater(() -> {
-            taskListView.scrollTo(index);
-            taskListView.getSelectionModel().clearAndSelect(index);
-        });
-    }
+//    public void scrollTo(int index) {
+//        Platform.runLater(() -> {
+//            taskListView.scrollTo(index);
+//            taskListView.getSelectionModel().clearAndSelect(index);
+//        });
+//    }
     
     @Subscribe
     public void handleNewTaskListEvent(NewTaskListEvent abce) {
-    	FilteredList<Task> newTasks = abce.filteredTasks;
+    	ArrayList<ObservableList<Task>> newTasks = abce.listOfLists;
 		setConnections(newTasks);
         logger.info(LogsCenter.getEventHandlingLogMessage(abce, "Refreshed task list"));
     }
@@ -116,6 +173,36 @@ public class TaskListPanel extends UiPart {
                 	cardPane.setStyle("-fx-background-color: yellow;");
                 } else {
                 	cardPane.setStyle(null);
+                }
+            }
+        }
+    }
+    
+    class FloatingListViewCell extends ListCell<Task> {
+
+        public FloatingListViewCell() {
+        }
+
+        //@@author A0138978E
+        @Override
+        protected void updateItem(Task task, boolean empty) {
+            super.updateItem(task, empty);
+            
+            if (empty || task == null) {
+                setGraphic(null);
+                setText(null);
+            } 
+            else {
+                TaskCard currentCard = TaskCard.load(task, getIndex() + index);
+                HBox cardPane = currentCard.getLayout();
+               
+                setGraphic(cardPane);
+                
+                // Set the color of the card based on whether it's favorited
+                if (task.isFavorite()) {
+                    cardPane.setStyle("-fx-background-color: yellow;");
+                } else {
+                    cardPane.setStyle(null);
                 }
             }
         }

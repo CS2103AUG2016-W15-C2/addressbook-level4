@@ -125,10 +125,10 @@ public class UiManager extends ComponentManager implements Ui {
         mainWindow.handleAliasList();
     }
 
-    @Subscribe
-    private void handleJumpToListRequestEvent(JumpToListRequestEvent event) {
-        logger.info(LogsCenter.getEventHandlingLogMessage(event));
-        mainWindow.getTaskListPanel().scrollTo(event.targetIndex);
-    }
+//    @Subscribe
+//    private void handleJumpToListRequestEvent(JumpToListRequestEvent event) {
+//        logger.info(LogsCenter.getEventHandlingLogMessage(event));
+//        mainWindow.getTaskListPanel().scrollTo(event.targetIndex);
+//    }
 
 }

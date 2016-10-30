@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.net.URL?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox maxHeight="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="seedu.address.ui.TaskListPanel">
@@ -11,6 +13,29 @@
         <URL value="@Extensions.css" />
     </stylesheets>
     <children>
-        <ListView fx:id="taskListView" maxHeight="1.7976931348623157E308" minWidth="300.0" prefWidth="300.0" VBox.vgrow="ALWAYS" />
+      <Label fx:id="overdueLabel" text="\$overdue" />
+        <ListView fx:id="overdueListView" minWidth="300.0" prefWidth="300.0" VBox.vgrow="ALWAYS" />
+      <Label fx:id="favoriteLabel" text="Favorite" />
+      <ListView fx:id="favoriteListView" />
+      <Label fx:id="floatingLabel" text="Floating Tasks" />
+      <ListView fx:id="floatingListView" prefWidth="200.0" />
+      <HBox prefHeight="0.0" prefWidth="300.0">
+         <children>
+            <Label fx:id="todayLabel" text="Today" />
+            <Label fx:id="todayDate" text="Date" />
+         </children>
+      </HBox>
+      <ListView fx:id="todayListView" prefWidth="200.0" />
+      <HBox prefHeight="0.0" prefWidth="300.0">
+         <children>
+            <Label fx:id="tomorrowLabel" text="Tomorrow" />
+            <Label fx:id="tomorrowDate" text="Date" />
+         </children>
+      </HBox>
+      <ListView fx:id="tomorrowListView" prefWidth="200.0" />
+      <Label fx:id="weekAheadLabel" text="Week Ahead" />
+      <ListView fx:id="weekAheadListView" prefWidth="200.0" />
+      <Label fx:id="othersLabel" text="Others" />
+      <ListView fx:id="othersListView" prefWidth="200.0" />
     </children>
 </VBox>

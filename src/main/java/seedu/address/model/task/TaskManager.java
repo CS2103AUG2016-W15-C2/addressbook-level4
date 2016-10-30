@@ -1,5 +1,8 @@
 package seedu.address.model.task;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -39,6 +42,17 @@ public class TaskManager extends ComponentManager implements InMemoryTaskList {
 	private UniqueItemCollection<Alias> aliases;
 	private FilteredList<Task> filteredTasks;
 	private final ModelHistory modelHistory; // Stores tasks & aliases to support undo & redo commands
+	
+	ObservableList<Task> overdueTasks;
+    ObservableList<Task> favoriteTasks;
+    ObservableList<Task> floatingTasks;
+    ObservableList<Task> todayTasks;
+    ObservableList<Task> tomorrowTasks;
+    ObservableList<Task> weekAheadTasks;
+    ObservableList<Task> otherTasks;
+    
+    ArrayList<ObservableList<Task>> listOfLists;
+
 
 	public TaskManager() {
 		this(new UniqueItemCollection<Task>(), new UniqueItemCollection<Alias>(), null);		
@@ -287,7 +301,7 @@ public class TaskManager extends ComponentManager implements InMemoryTaskList {
     }
     
     private void indicateNewTaskListEvent() {
-    	raise(new NewTaskListEvent(tasks, filteredTasks));
+    	raise(new NewTaskListEvent(tasks, filteredTasks,listOfLists));
     }
     
     private void indicateAliasChanged() {
@@ -339,7 +353,7 @@ public class TaskManager extends ComponentManager implements InMemoryTaskList {
 	}
     
    
-  //@@author A0139708W
+  //@@author A0139708W-reused
 	interface Expression {
         boolean satisfies(Task task);
         String toString();
@@ -388,5 +402,79 @@ public class TaskManager extends ComponentManager implements InMemoryTaskList {
         public String toString() {
             return "name=" + String.join(", ", nameKeyWords);
         }
+    }
+
+    @Override
+    public ArrayList<ObservableList<Task>> getListofLists() {
+        FilteredList<Task> local = new FilteredList<Task>(filteredTasks);
+        listOfLists = new ArrayList<ObservableList<Task>>();
+        initLists();
+        
+        for(Task i : local) {
+            if(i instanceof DatedTask) {
+                if(i instanceof DeadlineTask) {
+                    checkDeadlineTask(i);
+                }
+                else {
+                    checkEventTask(i);
+                }
+            }
+            else {
+                floatingTasks.add(i);
+
+            }
+        }
+        listOfLists.add(overdueTasks);
+        listOfLists.add(favoriteTasks);
+        listOfLists.add(floatingTasks);
+        listOfLists.add(todayTasks);
+        listOfLists.add(tomorrowTasks);
+        listOfLists.add(weekAheadTasks);
+        listOfLists.add(otherTasks);
+        return listOfLists;
+    }
+    
+    private void initLists() {
+        overdueTasks = FXCollections.observableArrayList();
+        favoriteTasks = FXCollections.observableArrayList();
+        floatingTasks = FXCollections.observableArrayList();
+        todayTasks = FXCollections.observableArrayList();
+        tomorrowTasks = FXCollections.observableArrayList();
+        weekAheadTasks = FXCollections.observableArrayList();
+        otherTasks = FXCollections.observableArrayList();
+    }
+    
+    private void checkDeadlineTask(Task task) {
+        DeadlineTask currentTask = (DeadlineTask) task;
+        Calendar compare = Calendar.getInstance();
+        compare.setTime(currentTask.getDeadline());
+        checkDates(compare, task);
+    }
+    
+    private void checkEventTask(Task task) {
+        EventTask currentTask = (EventTask) task;
+        Calendar compare = Calendar.getInstance();
+        compare.setTime(currentTask.getEndDate());
+        checkDates(compare, task);
+    }
+    
+    private void checkDates(Calendar compare, Task task) {
+        Calendar rightNow = Calendar.getInstance();
+        if(compare.after(rightNow)) {
+            overdueTasks.add(task);
+        }
+        else if(compare.get(Calendar.DAY_OF_WEEK) == rightNow.get(Calendar.DAY_OF_WEEK)) {
+            todayTasks.add(task);
+        }
+        else if(compare.get(Calendar.DAY_OF_WEEK) == rightNow.get(Calendar.DAY_OF_WEEK) + 1) {
+            tomorrowTasks.add(task);
+        }
+        else if(compare.get(Calendar.WEEK_OF_MONTH) == rightNow.get(Calendar.WEEK_OF_MONTH) + 1){
+            weekAheadTasks.add(task);
+        }
+        else {
+            otherTasks.add(task);
+        }
+        
     }
 }

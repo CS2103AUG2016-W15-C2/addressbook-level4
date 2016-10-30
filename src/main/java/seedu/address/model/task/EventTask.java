@@ -55,4 +55,5 @@ public class EventTask extends Task implements FavoritableTask, CompletableTask,
 		return String.format("[Event Task][Description: %s][Start date: %s][End date: %s]", 
 				description, dateFormat.format(startDate), dateFormat.format(endDate));
 	}
+	
 }
