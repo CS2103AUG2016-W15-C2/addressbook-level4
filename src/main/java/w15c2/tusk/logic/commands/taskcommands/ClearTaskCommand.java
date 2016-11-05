@@ -5,6 +5,7 @@ import w15c2.tusk.logic.commands.CommandResult;
 /**
  * Deletes all the tasks that are currently listed
  */
+//@@author A0139817U
 public class ClearTaskCommand extends TaskCommand {
 
         public static final String COMMAND_WORD = "clear";
