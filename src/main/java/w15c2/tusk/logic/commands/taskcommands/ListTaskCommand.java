@@ -1,10 +1,7 @@
 package w15c2.tusk.logic.commands.taskcommands;
 
 import w15c2.tusk.commons.core.EventsCenter;
-import w15c2.tusk.commons.events.ui.FilterLabelChangeEvent;
-import w15c2.tusk.commons.events.ui.HideHelpRequestEvent;
 import w15c2.tusk.commons.events.ui.ShowAliasListEvent;
-import w15c2.tusk.commons.events.ui.FilterLabelChangeEvent.COMMANDTYPE;
 import w15c2.tusk.commons.exceptions.IllegalValueException;
 import w15c2.tusk.logic.commands.CommandResult;
 
@@ -31,7 +28,7 @@ public class ListTaskCommand extends TaskCommand {
     public static final String MESSAGE_COMPLETED_SUCCESS = "Listed all completed tasks";
     public static final String MESSAGE_NO_COMPLETED_TASKS = "No completed tasks to list";
     
-    public final String argument;
+    private final String argument;
     
     public ListTaskCommand(String argument) 
     		throws IllegalValueException {

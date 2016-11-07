@@ -119,7 +119,7 @@ public class AliasListPanel extends UiPart {
     }
 
     //@@author A0139708W-reused
-    class AliasListViewCell extends ListCell<Alias> {
+    private class AliasListViewCell extends ListCell<Alias> {
 
         public AliasListViewCell() {
         }

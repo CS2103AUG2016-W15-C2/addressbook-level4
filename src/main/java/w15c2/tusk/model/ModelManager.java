@@ -326,7 +326,7 @@ public class ModelManager extends ComponentManager implements Model {
 	}
 	
 	
-	public void filterTasks(Expression expression) {
+	private void filterTasks(Expression expression) {
 	    filteredTasks.setPredicate(expression::satisfies);
 	}
 	
@@ -368,7 +368,7 @@ public class ModelManager extends ComponentManager implements Model {
     
    
   //@@author A0139708W-reused
-	interface Expression {
+	private interface Expression {
         boolean satisfies(Task task);
         String toString();
     }
@@ -392,7 +392,7 @@ public class ModelManager extends ComponentManager implements Model {
         }
     }
 
-    interface Qualifier {
+    private interface Qualifier {
         boolean run(Task task);
         String toString();
     }

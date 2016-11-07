@@ -6,9 +6,7 @@ import java.util.Date;
 import javafx.collections.ObservableList;
 import w15c2.tusk.commons.collections.UniqueItemCollection.DuplicateItemException;
 import w15c2.tusk.commons.collections.UniqueItemCollection.ItemNotFoundException;
-import w15c2.tusk.commons.core.EventsCenter;
 import w15c2.tusk.commons.core.Messages;
-import w15c2.tusk.commons.events.ui.HideHelpRequestEvent;
 import w15c2.tusk.commons.exceptions.IllegalValueException;
 import w15c2.tusk.commons.util.DateUtil;
 import w15c2.tusk.logic.commands.CommandResult;
@@ -42,14 +40,14 @@ public class UpdateTaskCommand extends TaskCommand {
             + "Example: " + COMMAND_WORD + " 1 date Oct 31 to Nov 1";
 
     public static final String MESSAGE_UPDATE_TASK_SUCCESS = "Updated task: %1$s";
-    public static final String MESSAGE_CANNOT_UPDATE_TASK = "Selected task's description cannot be updated";
+    private static final String MESSAGE_CANNOT_UPDATE_TASK = "Selected task's description cannot be updated";
     
     public static final String TASK_DETAILS_UPDATE_TASK = "[Update Task][Task: %s]";
     public static final String TASK_DETAILS_UPDATE_DESCRIPTION = "[Update Task][Description: %s]";
     public static final String TASK_DETAILS_UPDATE_DEADLINE = "[Update Task][Deadline: %s]";
     public static final String TASK_DETAILS_UPDATE_START_END_DATE = "[Update Task][Start date: %s][End date: %s]";
     
-    public final int targetIndex;
+    private final int targetIndex;
     private Task updatedTask;
     
     // Values that are to be updated. If it is not supposed to be updated, it will be null
@@ -108,7 +106,7 @@ public class UpdateTaskCommand extends TaskCommand {
      * Given the task that is to be updated, create a new updatedTask to replace it
      * by retrieving the values to be updated
      */
-    public void prepareUpdatedTask(Task taskToUpdate) throws IllegalValueException {
+    private void prepareUpdatedTask(Task taskToUpdate) throws IllegalValueException {
     	if (newTask != null) {
     		// User wants to change the entire task
     		updatedTask = newTask;
@@ -142,7 +140,7 @@ public class UpdateTaskCommand extends TaskCommand {
     /**
      * Create a new task with a different description to replace taskToUpdate
      */
-    public Task prepareUpdatedDescriptionForTask(Task taskToUpdate) throws IllegalValueException {
+    private Task prepareUpdatedDescriptionForTask(Task taskToUpdate) throws IllegalValueException {
     	// Return a new Task based on the type of the task to be updated
 		if (taskToUpdate instanceof FloatingTask) {
 			return new FloatingTask(newDescription.getContent());
@@ -163,7 +161,7 @@ public class UpdateTaskCommand extends TaskCommand {
     /**
      * Create a new task with a different deadline to replace taskToUpdate
      */
-    public Task prepareUpdatedDeadlineForTask(Task taskToUpdate) throws IllegalValueException {
+    private Task prepareUpdatedDeadlineForTask(Task taskToUpdate) throws IllegalValueException {
     	// Create a deadline task to replace the original task
     	String description = taskToUpdate.getDescription().getContent();
 		return new DeadlineTask(description, newDeadline);
@@ -172,7 +170,7 @@ public class UpdateTaskCommand extends TaskCommand {
     /**
      * Create a new task with a different start and end date to replace taskToUpdate
      */
-    public Task prepareUpdatedStartEndDateForTask(Task taskToUpdate) throws IllegalValueException {
+    private Task prepareUpdatedStartEndDateForTask(Task taskToUpdate) throws IllegalValueException {
     	// Create an event task to replace the original task
     	String description = taskToUpdate.getDescription().getContent();
 		return new EventTask(description, newStartDate, newEndDate);

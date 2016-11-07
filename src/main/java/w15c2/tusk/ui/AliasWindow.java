@@ -66,7 +66,7 @@ public class AliasWindow extends UiPart {
     }
     
     // Set appropriate dimensions
-    public void setDimensions() {
+    private void setDimensions() {
         dialogStage.setMinHeight(WINDOW_HEIGHT);
         dialogStage.setMaxHeight(WINDOW_HEIGHT);
         dialogStage.setMinWidth(WINDOW_WIDTH);
